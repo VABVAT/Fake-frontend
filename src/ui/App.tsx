@@ -1,39 +1,57 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import styles from "./App.module.css";
+import Navbar from './components/Navbar'
+import InputBar from './components/InputBar';
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [UsageMode, setUsageMode] = useState("");
+  const [count, _setCount] = useState(0);
+  const [_usageMode, _setUsageMode] = useState("");
+  const [firstSearch, _setFirstSearch] = useState( false);
 
   useEffect(() => {
     pingElectron();
   }, [count]);
 
-  async function pingElectron(){
+  async function pingElectron() {
     // @ts-ignore
     const response = await window.electronAPI.ping();
     console.log(response);
   }
 
-  const handleClick = async ()=>{
-    // @ts-ignore
-    let response = await window.electronAPI.sendRequest();
-    const responseObj = JSON.parse(response);
-    console.log("Response from main process:", responseObj.contents);
-    
-  }
-
   return (
-    <>
-      <h1>GENAI</h1>
-      <input className='no-drag' type="text" placeholder='Type @judge...'/>
-        <button className='no-drag' onClick={()=>{handleClick()}}>Submit</button>
-        
-    </>
-  )
+    <div className="min-h-screen w-screen flex flex-col overflow-hidden">
+      {/* Navbar*/}
+      <div className="sticky top-0 z-50">
+        <Navbar />
+      </div>
+
+      {/* Initial screen InputBar in middle*/}
+      {firstSearch && (
+        <div className="no-drag flex-1 flex flex-col items-center justify-center space-y-5 rounded-2xl mx-3 my-6 p-2 bg-black/20">
+          <div className="flex flex-col items-center justify-center space-y-5">
+            <h1 className="text-white text-xl">Hello! JUDGE</h1>
+            <InputBar firstSearch={firstSearch} />
+          </div>
+        </div>
+      )}
+
+      {/* After first search */}
+      {!firstSearch && (
+        <>
+          {/* Main content*/}
+          <div className="flex-1 flex flex-col items-center justify-center mx-3 my-2 rounded-2xl p-2 bg-black/20">
+            <div className="flex flex-col items-center justify-center space-y-5 w-full h-full">
+              <div>Content</div>
+            </div>
+          </div>
+
+          {/*InputBar*/}
+          <div className="sticky bottom-0 z-50 flex justify-center py-2">
+            <InputBar firstSearch={firstSearch} />
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;

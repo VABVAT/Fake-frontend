@@ -40,7 +40,7 @@ function createMiniWindow() {
 function createMainWindow() {
   mainWindow = new BrowserWindow({
 
-    width: 800,
+    width: 400,
     height: 600,
     transparent: true,
     frame: false,
@@ -57,7 +57,7 @@ function createMainWindow() {
     mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
   }
   if(miniWindow){
-    const offsetX = -850;
+    const offsetX = -450;
     const offsetY = 90;
     const {x , y} = miniWindow.getBounds();
     mainWindow.setBounds({x : x + offsetX, y : y + offsetY});
