@@ -1,8 +1,7 @@
 const Navbar = () => {
   return (
     <header
-      className="bg-base-100 w-full flex flex-row justify-between items-center
-    backdrop-blur-lg"
+      className="w-full flex flex-row justify-between items-center backdrop-blur-lg"
     >
       <div className="container mx-auto px-3 h-12">
         <div className="flex items-center justify-between h-full">

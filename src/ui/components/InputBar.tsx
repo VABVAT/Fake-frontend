@@ -1,4 +1,5 @@
 import { useState } from "react";
+import search from "../assets/search_icon_white.png"
 
 type InputBarProps = {
   firstSearch: boolean;
@@ -58,7 +59,7 @@ const InputBar = ({firstSearch}: InputBarProps) => {
         />
         {isOptionsVisible && (
           <ul
-            className={`no-drag ${firstSearch ? "absolute": "absolute bottom-full"}`}
+            className={`no-drag rounded-lg bg-white/5 shadow-2xl p-1 backdrop-blur-xl ${firstSearch ? "absolute": "absolute bottom-full mb-1"}`}
             role="listbox"
           >
             {filteredOptions.map((item: string, index: number) => (
@@ -66,7 +67,8 @@ const InputBar = ({firstSearch}: InputBarProps) => {
                 <button
                   type="button"
                   onClick={() => handleSelect(item)}
-                  className="w-full text-left px-4 mx-2 hover:bg-blue-600 hover:text-white cursor-pointer"
+                  // className={`hover:text-white hover:font-bold cursor-pointer ${!firstSearch ? "bg-white/10 rounded-lg text-sm shadow-lg  whitespace-nowrap px-2 mb-1" : "text-left pr-4 pl-3"}`}
+                  className={`hover:text-white hover:font-medium cursor-pointer pr-4 pl-3`}
                 >
                   {item}
                 </button>
@@ -78,9 +80,9 @@ const InputBar = ({firstSearch}: InputBarProps) => {
 
       <button
         onClick={handleClick}
-        className="no-drag rounded-full w-10 h-10 border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+        className="no-drag rounded-full w-10 h-10 border border-gray-300 flex items-center justify-center hover:border-white hover:border-2"
       >
-        S
+        <img src={search} alt="Search" className="w-6 h-6 hover:scale-110" />
       </button>
     </div>
   );
