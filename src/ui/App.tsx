@@ -3,7 +3,6 @@ import Navbar from './components/Navbar'
 import InputBar from './components/InputBar';
 
 function App() {
-  const [count, _setCount] = useState(0);
   const [usageMode, setUsageMode] = useState("");
   const [firstSearch, setFirstSearch] = useState(true);
   const [loading, setLoading] = useState(false);
