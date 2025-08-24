@@ -7,12 +7,13 @@ import captureScreenShot from "./captureScreenShot.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 import { wrap } from "module";
+import { create } from "domain";
 dotenv.config();
-
 
 let mainWindow: BrowserWindow | null = null;
 let miniWindow: BrowserWindow | null = null;
-
+let loadingWindow: BrowserWindow | null = null;
+let loadingState = false;
 
 app.on("ready", createMiniWindow);
 
@@ -28,27 +29,47 @@ function createMiniWindow() {
     webPreferences: {
       preload: path.join(app.getAppPath(), "dist-electron/preload.cjs"),
     },
+    skipTaskbar: true,
   });
-
 
   miniWindow.loadFile(path.join(app.getAppPath(), "public/minWin.html"));
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  miniWindow.setBounds({ x: width-80, y: 10, width: 80, height: 80 });
+  miniWindow.setBounds({ x: width - 80, y: 10, width: 80, height: 80 });
   miniWindow.setContentProtection(true);
+}
+
+function createLoadingWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  loadingWindow = new BrowserWindow({
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    movable: false,
+    webPreferences: {
+      preload: path.join(app.getAppPath(), "dist-electron/preload.cjs"),
+    },
+    // skipTaskbar: true,
+  });
+
+  loadingWindow.loadFile(path.join(app.getAppPath(), "public/loading.html"));
+  loadingWindow.setBounds({ height: height*6/7, width: width ,x : 0,y : height/12});
+  loadingWindow.setContentProtection(true);
 }
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-
     width: 400,
     height: 600,
     transparent: true,
+    alwaysOnTop: true,
     frame: false,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       preload: getPreloadPath(),
     },
+    skipTaskbar: true,
   });
 
   if (isDev()) {
@@ -56,56 +77,59 @@ function createMainWindow() {
   } else {
     mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
   }
-  if(miniWindow){
-    const offsetX = -450;
-    const offsetY = 90;
-    const {x , y} = miniWindow.getBounds();
-    mainWindow.setBounds({x : x + offsetX, y : y + offsetY});
+  if (miniWindow) {
+    const offsetX = -400;
+    const offsetY = 70;
+    const { x, y } = miniWindow.getBounds();
+    mainWindow.setBounds({ x: x + offsetX, y: y + offsetY });
   }
   mainWindow.setContentProtection(true);
   mainWindow.webContents.openDevTools();
 }
 
 ipcMain.handle("minButtonClicked", () => {
-  if (mainWindow && miniWindow) {
-    if(mainWindow.isVisible()){
-      mainWindow.hide();
+  if (!loadingState) {
+    if (mainWindow && miniWindow) {
+      if (mainWindow.isVisible()) {
+        mainWindow.hide();
+      } else {
+        const offsetX = -400;
+        const offsetY = 70;
+        const { x, y } = miniWindow.getBounds();
+        mainWindow.setBounds({ x: x + offsetX, y: y + offsetY });
+        mainWindow.show();
+        mainWindow.setContentProtection(true);
+      }
+    } else {
+      createMainWindow();
     }
-    else{
-      const offsetX = -850;
-      const offsetY = 90;
-      const {x, y} = miniWindow.getBounds();
-      mainWindow.setBounds({x : x + offsetX, y : y + offsetY});
-      mainWindow.show();
-      mainWindow.setContentProtection(true);
-    }
-  }
-  else{
-    createMainWindow();
   }
 });
 
-ipcMain.handle("send-request", async ()=>{
-  try{
+ipcMain.handle("send-request", async (_event, type : string) => {
+  try {
     const imgBase64 = await captureScreenShot();
-    const API_KEY =  process.env.API_KEY || "" ;
+    const API_KEY = process.env.API_KEY || "";
     const genAI = new GoogleGenerativeAI(API_KEY);
 
-    const model = genAI.getGenerativeModel({model : "gemini-2.5-flash"});
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `You are an AI that extracts structured information from an image.I have provided you with a base64 encoded image.Your task is to analyze the image and respond ONLY in valid JSON.  If there are multiple distinct contents on the page (for example, multiple articles,sections, or items), return a JSON array of objects. Each object must strictly follow the RequestDto format:
+    const prompt = `You are given an image that may contain different kinds of content (e.g., email, news article, invoice, or general text).  
+Your task is to extract only the content of type = ${type} and return it strictly in the following JSON format:
 
 RequestDto {
     "info_type": string,       // Type of information extracted (e.g., "invoice", "id_card", "news_article", "business_card", etc.)
     "headline": string,        // A short descriptive headline for the extracted content
     "information": string,     // Detailed information extracted from the image
     "meta_data": string        // Any additional metadata such as date, location, reference number, etc.
-}
+}}
 
 ⚠️ Rules:
-- Always return an array (even if only one object is found).
-- Do not include explanations, comments, or extra text outside the JSON.
-- Ensure the JSON is syntactically valid.
+- Extract and return only the requested type: "<requested_type>".
+- If the requested type is not present in the image, return all fields as empty strings "".
+- Do not include anything outside the JSON object.
+- Do not invent data that is not visible in the image.
+
 `;
     const imagePart = {
       inlineData: {
@@ -115,16 +139,37 @@ RequestDto {
     };
 
     const result = await model.generateContent([prompt, imagePart]);
-    let response = await result.response.text();
+    let response = result.response.text();
     response = response.replace(/```json|```/g, "").trim();
     const jsonRespose = JSON.parse(response);
     const wrapped = { contents: jsonRespose };
     const wrappedJson = JSON.stringify(wrapped, null, 2);
 
     return wrappedJson;
-  }
-  catch(err){
+  } catch (err) {
     console.error("Error capturing screenshot:", err);
     throw err;
   }
-})
+});
+
+ipcMain.handle("start-loading", () => {
+  if (mainWindow) {
+    mainWindow.hide();
+    createLoadingWindow();
+    loadingState = true;
+  }
+});
+
+ipcMain.handle("stop-loading", () => {
+  if (loadingWindow && mainWindow && miniWindow) {
+    loadingWindow.close();
+    loadingWindow = null;
+    loadingState = false;
+    const offsetX = -400;
+    const offsetY = 70;
+    const { x, y } = miniWindow.getBounds();
+    mainWindow.setBounds({ x: x + offsetX, y: y + offsetY });
+    mainWindow.show();
+    mainWindow.setContentProtection(true);
+  }
+});

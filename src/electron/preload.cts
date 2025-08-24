@@ -8,7 +8,13 @@ electron.contextBridge.exposeInMainWorld('electronAPI', {
     minButtonClicked: async () => {
         return await electron.ipcRenderer.invoke('minButtonClicked');
     },
-    sendRequest: async ()=> {
-        return await electron.ipcRenderer.invoke('send-request');
+    sendRequest: async (type : string)=> {
+        return await electron.ipcRenderer.invoke('send-request', type);
+    },
+    startLoading: async () => {
+        electron.ipcRenderer.invoke('start-loading');
+    },
+    stopLoading: async () => {
+        electron.ipcRenderer.invoke('stop-loading');
     }
 });

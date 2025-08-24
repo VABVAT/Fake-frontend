@@ -1,11 +1,16 @@
-import { useState } from "react";
+import React, { useEffect,useState } from "react";
 import search from "../assets/search_icon_white.png"
 
 type InputBarProps = {
   firstSearch: boolean;
+  setFirstSearch : React.Dispatch<React.SetStateAction<boolean>>;
+  loading : boolean;
+  setLoading : React.Dispatch<React.SetStateAction<boolean>>;
+  debug:  string;
+  setDebug: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const InputBar = ({firstSearch}: InputBarProps) => {
+const InputBar = ({firstSearch, setFirstSearch, loading, setLoading, debug, setDebug}: InputBarProps) => {
   const options = [
     "@judge: News",
     "@judge: Email",
@@ -15,6 +20,17 @@ const InputBar = ({firstSearch}: InputBarProps) => {
   const [inputValue, setInputValue] = useState("");
   const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
   const [isOptionsVisible, setIsOptionsVisible] = useState(false);
+
+  // useEffect(() => {
+  //     if(loading){
+  //       //@ts-ignore
+  //       window.electronAPI.startLoading();
+  //     }
+  //     else{
+  //       //@ts-ignore
+  //       window.electronAPI.stopLoading();
+  //     }
+  //   }, [loading]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -41,8 +57,15 @@ const InputBar = ({firstSearch}: InputBarProps) => {
   };
 
   const handleClick = async () => {
+    setLoading(true);
+    setFirstSearch(false);
+    let usageMode  = inputValue.split(":")[1]?.trim() || "General";
+    usageMode = usageMode.toLowerCase();
+    setDebug(usageMode);
     // @ts-ignore
-    const response = await window.electronAPI.sendRequest();
+    const response = await window.electronAPI.sendRequest(usageMode);
+    setLoading(false);
+    setDebug(response);
     const responseObj = JSON.parse(response);
     console.log("Response from main process:", responseObj.contents);
   };
