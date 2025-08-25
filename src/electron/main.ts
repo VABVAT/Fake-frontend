@@ -53,7 +53,7 @@ function createLoadingWindow() {
   });
 
   loadingWindow.loadFile(path.join(app.getAppPath(), "public/loading.html"));
-  loadingWindow.setBounds({ height: height*6/7, width: width ,x : 0,y : height/12});
+  loadingWindow.setBounds({ height: 400, width: 400 ,x : 20,y : 20});
   loadingWindow.setContentProtection(true);
 }
 

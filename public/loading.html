@@ -1,12 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matrix Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Dot flicker effect */
+    @keyframes pop {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.7);
+      }
+    }
+    .animate-pop {
+      animation: pop 2s ease-in-out infinite;
+    }
+
+    /* Scanning line animation */
+    @keyframes scan {
+      0% {
+        top: 0;
+      }
+      100% {
+        top: 100%;
+      }
+    }
+    .scan-line {
+      animation: scan 3s linear infinite;
+      /* box-shadow: 0 0 15px 3px #fff; */
+    }
+  </style>
 </head>
-<body class="border border-white">
-    
+<body>
+  <div class="relative w-screen h-screen overflow-hidden border-2 border-white rounded-lg">
+    <!-- Scanning line -->
+    <div class="absolute left-0 w-full h-0.3 bg-white scan-line shadow-[0_0_15px_1px_#fff]"></div>
+
+    <!-- Random dots -->
+    <div id="dots-container" class="absolute w-full h-full"></div>
+  </div>
+
+  <script>
+    const container = document.getElementById("dots-container");
+
+    // Generate 60 dots for density
+    for (let i = 0; i < 60; i++) {
+      const dot = document.createElement("span");
+      dot.className =
+        "absolute w-2 h-2 bg-green-400 rounded-full animate-pop";
+      dot.style.top = Math.random() * 100 + "%";
+      dot.style.left = Math.random() * 100 + "%";
+      dot.style.animationDelay = Math.random() * 5 + "s";
+      dot.style.animationDuration = 1 + Math.random() * 3 + "s";
+      dot.style.boxShadow = "0 0 8px #00ff88"; // glowing effect
+
+      container.appendChild(dot);
+    }
+  </script>
 </body>
 </html>
