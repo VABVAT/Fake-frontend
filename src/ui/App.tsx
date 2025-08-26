@@ -3,7 +3,7 @@ import Navbar from './components/Navbar'
 import InputBar from './components/InputBar';
 
 function App() {
-  const [usageMode, setUsageMode] = useState("");
+  const [debug, setDebug] = useState("");
   const [firstSearch, setFirstSearch] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +33,7 @@ function App() {
                       bg-white/10 backdrop-blur-xl shadow-2xl border border-white/20">
         <div className="flex flex-col items-center justify-center space-y-5">
           <h1 className="text-white text-2xl font-semibold drop-shadow-md">Hello! JUDGE</h1>
-          <InputBar firstSearch={firstSearch} setFirstSearch={setFirstSearch} loading={loading} setLoading={setLoading} debug={usageMode} setDebug={setUsageMode}/>
+          <InputBar firstSearch={firstSearch} setFirstSearch={setFirstSearch} setLoading={setLoading} setDebug={setDebug}/>
         </div>
       </div>
     )}
@@ -45,14 +45,14 @@ function App() {
         <div className="no-drag flex-1 flex flex-col items-center justify-center mx-3 my-2 p-6 
                         rounded-3xl bg-white/10 backdrop-blur-xl text-white shadow-xl border border-white/20">
           <div className="flex flex-col items-center justify-center space-y-5 w-full h-full">
-            <div className="text-lg font-medium">{usageMode}</div>
+            <div className="text-lg font-medium">{debug}</div>
           </div>
         </div>
 
         {/*InputBar*/}
         <div className="sticky bottom-0 z-50 flex justify-center py-2 
                         bg-gradient-to-t from-black/40 via-transparent to-transparent">
-          <InputBar firstSearch={firstSearch} setFirstSearch={setFirstSearch} loading={loading} setLoading={setLoading} debug={usageMode} setDebug={setUsageMode}/>
+          <InputBar firstSearch={firstSearch} setFirstSearch={setFirstSearch} setLoading={setLoading} setDebug={setDebug}/>
         </div>
       </>
     )}

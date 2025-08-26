@@ -1,7 +1,7 @@
 {
     "appId" : "com.example.genai",
     "files" : ["dist-react", "dist-electron", "public"],
-    "icon" : "public/icon.ico",
+    "icon" : "public/logo.ico",
     "mac" : {
         "target" : "dmg"
     },

@@ -72,11 +72,15 @@ function createMainWindow() {
     skipTaskbar: true,
   });
 
+  //For developing
   if (isDev()) {
     mainWindow.loadURL("http://localhost:5173/");
   } else {
     mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
   }
+
+  //for building
+  // mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
   if (miniWindow) {
     const offsetX = -400;
     const offsetY = 70;
@@ -110,6 +114,7 @@ ipcMain.handle("send-request", async (_event, type : string) => {
   try {
     const imgBase64 = await captureScreenShot();
     const API_KEY = process.env.API_KEY || "";
+    const VERIFY_ENDPOINT = process.env.VERIFY_NEWS || "";
     const genAI = new GoogleGenerativeAI(API_KEY);
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -142,10 +147,21 @@ RequestDto {
     let response = result.response.text();
     response = response.replace(/```json|```/g, "").trim();
     const jsonRespose = JSON.parse(response);
-    const wrapped = { contents: jsonRespose };
-    const wrappedJson = JSON.stringify(wrapped, null, 2);
+    // const wrapped = { contents: jsonRespose };
+    const wrappedJson = JSON.stringify(jsonRespose);
 
-    return wrappedJson;
+    const Response = await fetch(VERIFY_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: wrappedJson,
+    });
+    
+    const data = await Response.json();
+    const finalResult = JSON.stringify(data, null, 2);
+    
+    return finalResult;
   } catch (err) {
     console.error("Error capturing screenshot:", err);
     throw err;

@@ -4,9 +4,7 @@ import search from "../assets/search_icon_white.png"
 type InputBarProps = {
   firstSearch: boolean;
   setFirstSearch : React.Dispatch<React.SetStateAction<boolean>>;
-  loading : boolean;
   setLoading : React.Dispatch<React.SetStateAction<boolean>>;
-  debug:  string;
   setDebug: React.Dispatch<React.SetStateAction<string>>;
 };
 
