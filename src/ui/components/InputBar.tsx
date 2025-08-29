@@ -1,11 +1,24 @@
 import React, { useState } from "react";
 import search from "../assets/search_icon_white.png"
 
+type EvidenceItem = {
+  quote: string;
+  source: string;
+};
+
+type DebugData = {
+  verdict: string;
+  confidence: number; // numeric string like "0.6"
+  evidence: EvidenceItem[];
+  recommended_actions: string;
+  reasoning: string;
+};
+
 type InputBarProps = {
   firstSearch: boolean;
   setFirstSearch : React.Dispatch<React.SetStateAction<boolean>>;
   setLoading : React.Dispatch<React.SetStateAction<boolean>>;
-  setDebug: React.Dispatch<React.SetStateAction<string>>;
+  setDebug: React.Dispatch<React.SetStateAction<DebugData>>;
 };
 
 const InputBar = ({firstSearch, setFirstSearch, setLoading, setDebug}: InputBarProps) => {
@@ -84,7 +97,6 @@ const InputBar = ({firstSearch, setFirstSearch, setLoading, setDebug}: InputBarP
     setFirstSearch(false);
     let usageMode  = inputValue.split(":")[1]?.trim() || "General";
     usageMode = usageMode.toLowerCase();
-    setDebug(usageMode);
     // @ts-ignore
     const response = await window.electronAPI.sendRequest(usageMode);
     setLoading(false);
