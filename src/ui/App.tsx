@@ -42,7 +42,7 @@ interface DebugData {
   return (
   <div className="min-h-screen w-screen flex flex-col overflow-hidden rounded-3xl 
                 bg-gradient-to-br from-indigo-900/70 via-purple-900/70 to-black/70">
-
+                  
     {/* Initial screen (before first search) remove ! here*/}
     {firstSearch && (
       <>
@@ -57,7 +57,7 @@ interface DebugData {
                         bg-white/10 backdrop-blur-xl shadow-2xl border border-white/20">
 
           <div className="flex flex-col items-center justify-center space-y-5">
-            <h1 className="text-white text-2xl font-semibold drop-shadow-md">
+            <h1 className="text-white text-2xl font-semibold drop-shadow-md font-[Segoe_Fluent_Icons]">
               Hello! JUDGE
             </h1>
 

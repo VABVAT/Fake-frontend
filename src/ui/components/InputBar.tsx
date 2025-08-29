@@ -107,15 +107,15 @@ const InputBar = ({firstSearch, setFirstSearch, setLoading, setDebug}: InputBarP
 
   return (
     <div>
-      <form className="no-drag flex flex-row space-x-2 items-center ">
-        <div className={`relative  ${firstSearch ? "w-60": "w-80"}`}>
+      <form className="no-drag flex flex-row space-x-2 items-center font-[Segoe_Fluent_Icons]">
+        <div className={`relative  ${firstSearch ? "w-60": "w-80"} `}>
           <input
             type="text"
             placeholder="Type @judge..."
             value={inputValue}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            className="w-full border-2 border-gray-300 rounded-full px-4 py-2 outline-none no-drag"
+            className="w-full border-2 border-gray-300 rounded-full px-4 py-2 outline-none no-drag hover:border-white hover:border-2 hover:shadow-lg focus:border-white focus:border-2 focus:shadow-lg transition-all duration-200"
           />
           {isOptionsVisible && (
             <ul
@@ -140,7 +140,7 @@ const InputBar = ({firstSearch, setFirstSearch, setLoading, setDebug}: InputBarP
         </div>
         <button
           onClick={handleClick}
-          className="no-drag rounded-full w-10 h-10 border border-gray-300 flex items-center justify-center hover:border-white hover:border-2"
+          className="no-drag rounded-full w-10 h-10 border border-gray-300 flex items-center justify-center hover:border-white hover:border-2 hover:shadow-lg transition-all duration-200"
         >
           <img src={search} alt="Search" className="w-6 h-6 hover:scale-110" />
         </button>
