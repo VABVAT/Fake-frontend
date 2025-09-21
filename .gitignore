@@ -13,7 +13,7 @@ dist-react
 dist-electron
 *.local
 
-.env
+
 dev.txt
 
 # Editor directories and files
