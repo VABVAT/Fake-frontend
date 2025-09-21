@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, screen , Menu, MenuItem} from "electron";
 import path from "path";
 import { isDev } from "./util.js";
 import { ipcMain } from "electron";
@@ -6,8 +6,6 @@ import { getPreloadPath } from "./pathResolver.js";
 import captureScreenShot from "./captureScreenShot.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
-import { wrap } from "module";
-import { create } from "domain";
 dotenv.config();
 
 let mainWindow: BrowserWindow | null = null;
@@ -36,6 +34,20 @@ function createMiniWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   miniWindow.setBounds({ x: width - 80, y: 10, width: 80, height: 80 });
   miniWindow.setContentProtection(true);
+
+  const contextMenu = new Menu();
+  contextMenu.append(
+    new MenuItem({
+      label: "Close App",
+      click: () => {
+        app.quit();
+      },
+    })
+  );
+
+  miniWindow.webContents.on("context-menu", () => {
+    contextMenu.popup();
+  });
 }
 
 function createLoadingWindow() {
@@ -46,14 +58,14 @@ function createLoadingWindow() {
     alwaysOnTop: true,
     resizable: false,
     movable: false,
+    skipTaskbar: true,
     webPreferences: {
       preload: path.join(app.getAppPath(), "dist-electron/preload.cjs"),
     },
-    // skipTaskbar: true,
   });
 
   loadingWindow.loadFile(path.join(app.getAppPath(), "public/loading.html"));
-  loadingWindow.setBounds({ height: 400, width: 400 ,x : 20,y : 20});
+  loadingWindow.setBounds({ height: height, width: width-20 ,x : 0,y : 40});
   loadingWindow.setContentProtection(true);
 }
 
@@ -72,15 +84,8 @@ function createMainWindow() {
     skipTaskbar: true,
   });
 
-  //For developing
-  if (isDev()) {
-    mainWindow.loadURL("http://localhost:5173/");
-  } else {
-    mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
-  }
-
   //for building
-  // mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
+  mainWindow.loadFile(path.join(app.getAppPath(), "/dist-react/index.html"));
   if (miniWindow) {
     const offsetX = -400;
     const offsetY = 70;
@@ -88,7 +93,6 @@ function createMainWindow() {
     mainWindow.setBounds({ x: x + offsetX, y: y + offsetY });
   }
   mainWindow.setContentProtection(true);
-  mainWindow.webContents.openDevTools();
 }
 
 ipcMain.handle("minButtonClicked", () => {
